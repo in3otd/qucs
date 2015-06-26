@@ -128,6 +128,9 @@ QucsApp::QucsApp()
   // instance of tuner
   tunerDia = new TunerDialog(0);
 
+  // instance of simulation windows
+  sim = new SimMessage(this);
+
   // creates a document called "untitled"
   Schematic *d = new Schematic(this, "");
   int i = DocumentTab->addTab(d, QPixmap(":/bitmaps/empty.xpm"), QObject::tr("untitled"));
@@ -2060,16 +2063,19 @@ void QucsApp::slotSimulate()
     return;
   }
 
-  SimMessage *sim = new SimMessage(w, this);
+  //SimMessage *sim = new SimMessage(w, this);
+  sim->setDocWidget(w);
+
   // disconnect is automatically performed, if one of the involved objects
   // is destroyed !
   connect(sim, SIGNAL(SimulationEnded(int, SimMessage*)), this,
 		SLOT(slotAfterSimulation(int, SimMessage*)));
   connect(sim, SIGNAL(displayDataPage(QString&, QString&)),
 		this, SLOT(slotChangePage(QString&, QString&)));
+  connect(sim, SIGNAL(SimulationEnded(int,SimMessage*)),
+          tunerDia, SLOT(slotSimulationEnded()));
 
-  if (!tunerDia->isVisible())// We're tuning, don't need 20 Windows
-    sim->show();
+  sim->show();
 
   if(!sim->startProcess()) return;
 
@@ -2093,7 +2099,8 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
       break;
 
   if(sim->showBias == 0) {  // paint dc bias into schematic ?
-    sim->slotClose();   // close and delete simulation window
+      // modbykevin should we still close automatically if the window is global?
+    // sim->slotClose();   // close and delete simulation window
     if(w) {  // schematic still open ?
       SweepDialog *Dia = new SweepDialog((Schematic*)sim->DocWidget);
 
@@ -2116,7 +2123,8 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
       }
       else
 	slotChangePage(sim->DocName, sim->DataDisplay);
-      sim->slotClose();   // close and delete simulation window
+      // modbykevin: since SimMessage is global should we still close it automatically
+      // sim->slotClose();   // close and delete simulation window
     }
     else
       if(w) if(!isTextDocument (sim->DocWidget))
