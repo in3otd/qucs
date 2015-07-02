@@ -2157,7 +2157,10 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
   }
 
   if(!isTextDocument (sim->DocWidget))
-    ((Schematic*)sim->DocWidget)->viewport()->update();
+  {
+    //((Schematic*)sim->DocWidget)->viewport()->update();
+      ((Schematic*)DocumentTab->currentPage())->viewport()->update();
+  }
 
   // Kill the simulation process, otherwise we have 200+++ sims in the background
   if(tunerDia->isVisible())
