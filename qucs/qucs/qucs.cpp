@@ -1623,7 +1623,7 @@ void QucsApp::slotFileClose(int index)
     closeFile(index);
 
     // Reset Tunerdialog
-    tunerDia->slotResetTunerDialog();
+    if (TuningMode) tunerDia->slotResetTunerDialog();
 }
 
 // --------------------------------------------------------------
@@ -1994,6 +1994,7 @@ void QucsApp::slotTune(bool checked)
     if (checked)
     {
         // instance of tuner
+        TuningMode = true;
         tunerDia = new TunerDialog(this);//The object can be instantiated here since when checked == false the memory will be freed
 
         slotHideEdit(); // disable text edit of component property
@@ -2021,6 +2022,7 @@ void QucsApp::slotTune(bool checked)
         // MouseActions are reset in closing of tunerDialog class
         tunerDia->close();//According to QWidget documentation (http://doc.qt.io/qt-4.8/qwidget.html#close),
                           //the object is removed since it has the Qt::WA_DeleteOnClose flag
+        TuningMode = false;
     }
 }
 
@@ -2105,9 +2107,12 @@ void QucsApp::slotSimulate()
         SLOT(slotAfterSimulation(int, SimMessage*)));
   connect(sim, SIGNAL(displayDataPage(QString&, QString&)),
         this, SLOT(slotChangePage(QString&, QString&)));
+
+  if (TuningMode == true)
+  {//It doesn't make sense to connect the slot outside the tuning mode
   connect(sim, SIGNAL(SimulationEnded(int,SimMessage*)),
           tunerDia, SLOT(slotSimulationEnded()));
-
+  }
   sim->show();
 
   if(!sim->startProcess()) return;
@@ -2172,7 +2177,7 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
   }
 
   // Kill the simulation process, otherwise we have 200+++ sims in the background
-  if(tunerDia->isVisible())
+  if(TuningMode)
       sim->slotClose();
 }
 

@@ -1107,7 +1107,7 @@ void MouseActions::MPressTune(Schematic *Doc, QMouseEvent *Event, float fX, floa
     else
       qDebug() << "MPressTune";
 
-    if(focusElement)
+    if(focusElement && App->TuningMode)
     {
         switch(focusElement->Type)
         {
