@@ -126,6 +126,8 @@ QucsApp::QucsApp()
   // instance of small text search dialog
   SearchDia = new SearchDialog(this);
 
+  TuningMode = false;//Force tuning mode to false
+
   // creates a document called "untitled"
   Schematic *d = new Schematic(this, "");
   int i = DocumentTab->addTab(d, QPixmap(":/bitmaps/empty.xpm"), QObject::tr("untitled"));
