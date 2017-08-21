@@ -2001,8 +2001,7 @@ void QucsApp::slotTune(bool checked)
 
         slotHideEdit(); // disable text edit of component property
         workToolbar->setEnabled(false); // disable workToolbar to preserve TuneMouseAction
-        QucsDoc *Doc;
-        QWidget *w = DocumentTab->currentPage();
+        QWidget *w = DocumentTab->currentWidget();
         if (isTextDocument(w))
         {
             //Probably digital Simulation. Tuning is limited to S-Parameter for now
@@ -2010,8 +2009,6 @@ void QucsApp::slotTune(bool checked)
                                                "Currently tuning is only supported by S-Parameter simulation", QMessageBox::Ok);
             return;
         }
-
-        Doc = (QucsDoc*)((Schematic*)w);
         MousePressAction = &MouseActions::MPressTune;
         MouseReleaseAction = 0; //While Tune is active release is not needed. This puts Press Action back to normal select
 
@@ -2182,7 +2179,7 @@ void QucsApp::slotAfterSimulation(int Status, SimMessage *sim)
   if(!isTextDocument (sim->DocWidget))
   {
     //((Schematic*)sim->DocWidget)->viewport()->update();
-      ((Schematic*)DocumentTab->currentPage())->viewport()->update();
+      ((Schematic*)DocumentTab->currentWidget())->viewport()->update();
   }
 
   // Kill the simulation process, otherwise we have 200+++ sims in the background
